@@ -1,9 +1,11 @@
 import MetaTrader5 as mt5
 import pandas as pd
-from datetime import date,datetime
+from datetime import datetime,timedelta
 import time
 
-'''                                    Trend identifier for scalping                                         '''
+'''                                  to install the module just type the below line in the cmd                          '''
+'''                                             pip install -r requirements.txt                                         '''
+'''                                              Trend identifier for scalping                                          '''
 
 def trend():
     i=20
@@ -18,7 +20,7 @@ def trend():
         i-=1
     return 1 if bullorbear['bull']>bullorbear['bear'] else 0
 
-'''                           a simple def to fill the request automatically                               '''
+'''                                     a simple def to fill the request automatically                                  '''
 
 def buyorsell(currency,tp,sl):
     bos=mt5.ORDER_TYPE_BUY if trend()==1 else mt5.ORDER_TYPE_SELL
@@ -42,7 +44,7 @@ def buyorsell(currency,tp,sl):
     }
     return request
 
-'''                           this is where the scalping algo is place                                   '''
+'''                                      this is where the scalping algo is place                                       '''
 
 def scalp_order(currency):
     trand=trend()
@@ -59,34 +61,36 @@ def scalp_order(currency):
     else:
         print("the market is consolidating now")
 
-'''                           fill the user login server details and password                             '''
+'''                                   fill the user login server details and password                                   '''
 
 try:
     mt5.initialize()
     user_details={"log":81816144,"ser":"MetaQuotes-Demo","pass":"3hLuFbW@"}
     mt5.login(login=user_details['log'], server=user_details['ser'],password=user_details['pass'])
-    print("successfully loged in now trying to find the oppertuntity to scalp")
+    print("successfully loged in to your account")
 except:
     print("An error occured during login")
     quit()
 
-'''                           setting the data frame to get the candle info                               '''
+'''                                     setting the data frame to get the candle info                                   '''
 
-todays_time=date.today()
-todays_time_lis=[todays_time.year,todays_time.month,todays_time.day]
-data=None#pd.DataFrame(mt5.copy_rates_range("EURUSD",mt5.TIMEFRAME_M5, todays_time.day-1, todays_time.day+1))
+curr_no=int(input("1:EURUSD\n2:GBPUSD\n3:USDCHF\n4:USDJPY\n5:USDCNH\n6:USDRUB\n7:AUDUSD\n8:NZDUSD\n9:USDCAD\n10:USDSEK\nEnter the exchange number:"))
+curr_lis=["EURUSD","GBPUSD","USDCHF","USDJPY","USDCNH","USDRUB","AUDUSD","NZDUSD","USDCAD","USDSEK"]
+req_curr=curr_lis[curr_no-1]
+print(f"The {req_curr} trading session started at:{datetime.now()}")
+data=None
 
-'''                         scalping part where the code is executed repeatedly                           '''
+'''                                  scalping part where the code is executed repeatedly                                '''
 
 while True:
     try:
         if mt5.positions_total()==0:
-            data=pd.DataFrame(mt5.copy_rates_range("EURUSD",mt5.TIMEFRAME_M5,datetime(2024,5,31),datetime(2024,6,2)))
-            scalp_order("EURUSD")
+            data=pd.DataFrame(mt5.copy_rates_range(req_curr,mt5.TIMEFRAME_M5,datetime.now()-timedelta(days=1),datetime.now()+timedelta(days=1)))
+            scalp_order(req_curr)
     except:
-        print("something went wrong")
+        mt5.shutdown()
+        print(f"The {req_curr} trading session ended at: {datetime.now()}")
         break
-mt5.shutdown()
 
 ''' 
 This code is just made for entertainment and educational purposes and use it at your own risk
