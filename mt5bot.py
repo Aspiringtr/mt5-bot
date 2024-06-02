@@ -65,7 +65,7 @@ def scalp_order(currency):
 
 try:
     mt5.initialize()
-    user_details={"log":81816144,"ser":"MetaQuotes-Demo","pass":"3hLuFbW@"}
+    user_details={"log":81816144,"ser":"MetaQuotes-Demo","pass":"3hLuFbW@"}#This is where you put account details 
     mt5.login(login=user_details['log'], server=user_details['ser'],password=user_details['pass'])
     print("successfully loged in to your account")
 except:
